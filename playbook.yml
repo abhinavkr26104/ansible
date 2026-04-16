@@ -4,13 +4,29 @@
   become: yes
 
   tasks:
-    - name: copy WAR file to Tomcat
+    - name: Install Java
+      apt:
+        name: openjdk-11-jdk
+        state: present
+        update_cache: yes
+
+    - name: Install Tomcat
+      apt:
+        name: tomcat9
+        state: present
+
+    - name: Ensure Tomcat is running
+      systemd:
+        name: tomcat9
+        state: started
+        enabled: yes
+
+    - name: Copy WAR file to Tomcat
       copy:
         src: "/var/snap/jenkins/5004/workspace/Ansible/target/Ansible.war"
-        dest: "/opt/tomcat/webapps/Ansible.war"
-        remote_src: no
+        dest: "/var/lib/tomcat9/webapps/Ansible.war"
 
     - name: Restart Tomcat
       systemd:
-        name: tomcat
+        name: tomcat9
         state: restarted
